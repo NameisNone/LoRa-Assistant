@@ -1,21 +1,21 @@
 package com.example.loraassistant.Adapter;
 
-import java.sql.Time;
 import java.util.Calendar;
-import java.util.Date;
 
 public class Alarm {
     private Calendar calendar;//定时时间
     private boolean LedState;//灯状态，true：开 false：关
     private boolean Period;//执行周期,true：执行一次 false：每天执行
     private int LedLight;//灯亮度
+    private boolean AlarmState = false;
 
-    public Alarm(int hour,int min,boolean period,boolean ledState,int ledLight){
+    public Alarm(int hour,int min,boolean period,boolean ledState,int ledLight,boolean alarmState){
         this.calendar = Calendar.getInstance();
         setTime(hour,min);
         this.Period = period;
         this.LedState = ledState;
         this.LedLight = ledLight;
+        this.AlarmState = alarmState;
     }
 
     //设置时间
@@ -43,6 +43,10 @@ public class Alarm {
         this.LedLight = value;
     }
 
+    //设置定时事件的状态 true：开 false：关
+    public void setAlarmState(boolean alarmState) {
+        this.AlarmState = alarmState;
+    }
 
     public int getHour(){
         return this.calendar.get(Calendar.HOUR_OF_DAY);
@@ -66,6 +70,10 @@ public class Alarm {
     //获取led的当前亮度
     public int getLedLight(){
         return this.LedLight;
+    }
+    //获取定时事件状态（开启或关闭）
+    public boolean getAlarmState(){
+        return this.AlarmState;
     }
 
 }

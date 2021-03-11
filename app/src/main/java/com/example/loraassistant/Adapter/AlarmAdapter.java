@@ -1,6 +1,5 @@
 package com.example.loraassistant.Adapter;
 
-import android.app.AlarmManager;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +10,7 @@ import android.widget.TextView;
 
 import com.example.loraassistant.R;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class AlarmAdapter extends BaseAdapter {
 
@@ -44,7 +41,7 @@ public class AlarmAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
         if (convertView == null) {
             convertView = mLayoutInflater.inflate(R.layout.listview_item, null);
@@ -71,6 +68,13 @@ public class AlarmAdapter extends BaseAdapter {
             String str = String.format("关");
             holder.tvLedState.setText(str);
         }
+        if(mAlarmData.get(position).getAlarmState()){
+            holder.img_AlarmSwitch.setTag("key_on");
+            holder.img_AlarmSwitch.setImageResource(R.mipmap.button_on);
+        }else if(!mAlarmData.get(position).getAlarmState()){
+            holder.img_AlarmSwitch.setTag("key_off");
+            holder.img_AlarmSwitch.setImageResource(R.mipmap.button_off);
+        }
 //      //按钮监听动作
         holder.img_AlarmSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,9 +82,11 @@ public class AlarmAdapter extends BaseAdapter {
                 if (holder.img_AlarmSwitch.getTag().equals("key_off")) {
                     holder.img_AlarmSwitch.setTag("key_on");
                     holder.img_AlarmSwitch.setImageResource(R.mipmap.button_on);
+                    mAlarmData.get(position).setAlarmState(true);
                 } else if (holder.img_AlarmSwitch.getTag().equals("key_on")) {
                     holder.img_AlarmSwitch.setTag("key_off");
                     holder.img_AlarmSwitch.setImageResource(R.mipmap.button_off);
+                    mAlarmData.get(position).setAlarmState(false);
                 }
             }
         });

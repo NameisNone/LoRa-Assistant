@@ -15,7 +15,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -41,7 +40,7 @@ import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class CtrlOneActivity extends Activity {
+public class CtrlActivity extends Activity {
 
     private byte light_value = 0;
 
@@ -64,13 +63,13 @@ public class CtrlOneActivity extends Activity {
     private Button mBtn1;
     private TimePickerView pvCustomTime;
 
-    public CtrlOneActivity() {
+    public CtrlActivity() {
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ctrl_one);
+        setContentView(R.layout.activity_ctrl);
 
         initUI();
     }
@@ -114,19 +113,28 @@ public class CtrlOneActivity extends Activity {
         mTv_NodeTitle = findViewById(R.id.tv_nodetitle);
     }
 
-    private void initAdapter() {
+    private void updateNodeParam() {
         Intent intent = getIntent();
         String nodename = intent.getStringExtra("nodename");
-        Toast.makeText(getApplicationContext(),nodename,Toast.LENGTH_SHORT).show();
+        String filename = intent.getStringExtra("filename");
+        String listfilename = intent.getStringExtra("listfilename");
 
-        mContext = CtrlOneActivity.this;
+        mTv_NodeTitle.setText(nodename);
+        mFileName = filename;
+        mListFileName = listfilename;
+    }
+
+    private void initAdapter() {
+        updateNodeParam();//从Fragment中获取参数
+
+        mContext = CtrlActivity.this;
         mListData = new LinkedList<Alarm>();
 
         String jsonstr = ReadListData();
         Log.i("File", jsonstr);
         LoadData(jsonstr);
-//        mListData.add(new Alarm(10, 30, true, true, 90));
-//        mListData.add(new Alarm(18, 30, false, false, 10));
+//        mListData.add(new Alarm(10, 30, true, true, 90,true));
+//        mListData.add(new Alarm(18, 30, false, false, 10,true));
         mAlarmAdapter = new AlarmAdapter(mContext, (LinkedList<Alarm>) mListData);
 
         mListView.setAdapter(mAlarmAdapter);
@@ -145,7 +153,7 @@ public class CtrlOneActivity extends Activity {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
 //            Log.i("item","长按："+position);
-            new SweetAlertDialog(CtrlOneActivity.this, SweetAlertDialog.WARNING_TYPE)
+            new SweetAlertDialog(CtrlActivity.this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("是否删除此定时事件?")
                     .setContentText("删除后将不可恢复!")
                     .setConfirmText("确定")
@@ -396,7 +404,7 @@ public class CtrlOneActivity extends Activity {
                 mAddHour = getPickViewHour(date);
                 mAddMin = getPickViewMin(date);
 
-                mListData.add(new Alarm(mAddHour, mAddMin, mAddPeriod, mAddState, mAddLightvalue));
+                mListData.add(new Alarm(mAddHour, mAddMin, mAddPeriod, mAddState, mAddLightvalue, false));
                 mListView.setAdapter(mAlarmAdapter);
             }
         })
@@ -514,7 +522,7 @@ public class CtrlOneActivity extends Activity {
         Gson gson = new Gson();
         jsonStr = gson.toJson(linkedList);//gson
         try {
-            fos = openFileOutput("Ctrl1.txt", Context.MODE_PRIVATE);
+            fos = openFileOutput(mListFileName, Context.MODE_PRIVATE);
             fos.write(jsonStr.getBytes());
         } catch (Exception e) {
             Log.i("File", "存储失败");
@@ -532,7 +540,7 @@ public class CtrlOneActivity extends Activity {
     private String ReadListData() {
         FileInputStream fis = null;
         try {
-            fis = openFileInput("Ctrl1.txt");
+            fis = openFileInput(mListFileName);
             byte[] outByte = new byte[fis.available()];
             StringBuilder sb = new StringBuilder("");
             int len = 0;
@@ -572,8 +580,8 @@ public class CtrlOneActivity extends Activity {
                 int LedLight = jsonObjArray[i].get("LedLight").getAsInt();
                 int hour = jsonObjArray[i].get("calendar").getAsJsonObject().get("hourOfDay").getAsInt();
                 int min = jsonObjArray[i].get("calendar").getAsJsonObject().get("minute").getAsInt();
-
-                mListData.add(new Alarm(hour, min, Period, State, LedLight));//添加到List中
+                boolean AlarmState = jsonObjArray[i].get("AlarmState").getAsBoolean();
+                mListData.add(new Alarm(hour, min, Period, State, LedLight, AlarmState));//添加到List中
 //                Log.i("File", String.format("LedLight:%d", jsonObjArray[i].get("LedLight").getAsInt()));
 //                Log.i("File", String.format("hourOfDay:%d", jsonObjArray[i].get("calendar").getAsJsonObject().get("hourOfDay").getAsInt()));
 //                Log.i("File", String.format("minute:%d", jsonObjArray[i].get("calendar").getAsJsonObject().get("minute").getAsInt()));
