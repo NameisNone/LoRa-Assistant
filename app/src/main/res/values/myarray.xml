@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="baudrate">
+        <item>1200</item>
+        <item>2400</item>
+        <item>4800</item>
+        <item>9600</item>
+        <item>14400</item>
+        <item>19200</item>
+        <item>115200</item>
+    </string-array>
+    <string-array name="databit">
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+    <string-array name="stopbit">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="parity">
+        <item>无</item>
+        <item>奇校验</item>
+        <item>偶校验</item>
+    </string-array>
+</resources>

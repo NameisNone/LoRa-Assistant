@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">LoRa Assistant</string>
+    <string name="spainner_title">波特率</string>
+</resources>

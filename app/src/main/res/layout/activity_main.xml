@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#0099CC"
+        android:gravity="center"
+        android:text="LoRa远程控制终端"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp" />
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/tv_title"
+        android:background="#E5E5E5" />
+
+    <FrameLayout
+        android:id="@+id/FrameLayout_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/view1"
+        android:layout_above="@id/view2"/>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_above="@id/rg_tab"
+        android:background="#E5E5E5" />
+
+    <RadioGroup
+        android:id="@+id/rg_tab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <RadioButton
+            android:id="@+id/rb_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@mipmap/tab_home"
+            android:gravity="center"
+            android:text="Home"
+            android:background="@drawable/bg_rdbtn"
+            android:textColor="@drawable/textcolor_rdbtn"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rb_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@mipmap/tab_setting"
+            android:gravity="center"
+            android:text="Setting"
+            android:background="@drawable/bg_rdbtn"
+            android:textColor="@drawable/textcolor_rdbtn"
+            android:textSize="16sp" />
+
+    </RadioGroup>
+
+</RelativeLayout>
