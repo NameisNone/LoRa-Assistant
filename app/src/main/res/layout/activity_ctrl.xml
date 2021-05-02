@@ -38,9 +38,10 @@
 
             <ImageView
                 android:id="@+id/img_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="right"
+                android:tag="off"
                 android:src="@mipmap/button_off" />
         </LinearLayout>
     </LinearLayout>

@@ -1,13 +1,14 @@
 package com.example.loraassistant;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,6 +23,10 @@ import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.listener.CustomListener;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleWriteCallback;
+import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.exception.BleException;
 import com.example.loraassistant.Adapter.Alarm;
 import com.example.loraassistant.Adapter.AlarmAdapter;
 import com.google.gson.Gson;
@@ -48,7 +53,7 @@ public class CtrlActivity extends Activity {
     private SeekBarListener sbListener;
     private OnClick onClick;
     private ImageView mImg_Switch;
-    private boolean led_state = false;
+//    private boolean led_state = false;
 
     private List<Alarm> mListData = null;
     private AlarmAdapter mAlarmAdapter = null;
@@ -60,10 +65,14 @@ public class CtrlActivity extends Activity {
     private String mFileName = null;
     private String mListFileName = null;
 
-    private Button mBtn1;
     private TimePickerView pvCustomTime;
 
+    private byte[] dataOn = {0x01};
+    private byte[] dataOff = {0x01};
+    private int mNodeNum;
+
     public CtrlActivity() {
+
     }
 
     @Override
@@ -89,7 +98,6 @@ public class CtrlActivity extends Activity {
     private void initUI() {
         mSb_Light = findViewById(R.id.sb_light);
 
-
         mSb_Light.setProgress(light_value);
         sbListener = new SeekBarListener();
         mSb_Light.setOnSeekBarChangeListener(sbListener);
@@ -111,6 +119,7 @@ public class CtrlActivity extends Activity {
         mListView.setOnItemLongClickListener(lvItemClick);
 
         mTv_NodeTitle = findViewById(R.id.tv_nodetitle);
+
     }
 
     private void updateNodeParam() {
@@ -122,6 +131,11 @@ public class CtrlActivity extends Activity {
         mTv_NodeTitle.setText(nodename);
         mFileName = filename;
         mListFileName = listfilename;
+
+        if(nodename.equals("节点1"))          mNodeNum = 1;
+        else if (nodename.equals("节点2"))    mNodeNum = 2;
+        else if (nodename.equals("节点3"))    mNodeNum = 3;
+        else if (nodename.equals("节点4"))    mNodeNum = 4;
     }
 
     private void initAdapter() {
@@ -211,17 +225,45 @@ public class CtrlActivity extends Activity {
                         mSb_Light.setProgress(0);
                     break;
                 case R.id.img_switch:
-                    if (led_state)
-                        mImg_Switch.setImageResource(R.mipmap.button_off);
-                    else
+                    if(mImg_Switch.getTag().equals("off")){//开灯
                         mImg_Switch.setImageResource(R.mipmap.button_on);
-                    led_state = !led_state;
+                        mImg_Switch.setTag("on");
+                        BleLedCtrl(true);
+                    }else if(mImg_Switch.getTag().equals("on")){//关灯
+                        mImg_Switch.setImageResource(R.mipmap.button_off);
+                        mImg_Switch.setTag("off");
+                        BleLedCtrl(false);
+                    }
                     break;
                 case R.id.tv_addTimedEvent:
 //                    pvCustomTime.show();
                     showCustomTimePicker();
                     break;
             }
+        }
+    }
+
+    private void BleLedCtrl(boolean ledState) {
+        byte dataState = (byte) (ledState ? 0x00 : 0x01);
+//        Log.i("dataState", String.format("0x%02x",dataState));
+        byte[] data = {(byte) mNodeNum,dataState};//BLE要发送的数据：第1个字节是节点号，第1个字节是led状态
+        Log.i("dataState", String.format("0x%02x",mNodeNum));
+
+        BluetoothGattService gattService = BleActivity.getGattService();
+        BluetoothGattCharacteristic characteristic = BleActivity.getCharacteristic();
+        BleDevice bleDevice = BleActivity.getBleDevice();
+        if(gattService != null && characteristic != null){
+            BleManager.getInstance().write(bleDevice, gattService.getUuid().toString(), characteristic.getUuid().toString(), data, new BleWriteCallback() {
+                @Override
+                public void onWriteSuccess(int current, int total, byte[] justWrite) {
+//                    Toast.makeText(getApplicationContext(),"执行成功",Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onWriteFailure(BleException exception) {
+//                    Toast.makeText(getApplicationContext(),"执行失败",Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
@@ -28,5 +28,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.github.f0ris.sweetalert:library:1.5.1'
     implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.clj.fastble:FastBleLib:2.3.4'
     implementation 'com.contrarywind:Android-PickerView:4.1.9'
+    implementation files('libs/CH34xUARTDrive_no_toast.jar')
 }
