@@ -59,7 +59,7 @@ public class Fragment_Setting extends Fragment implements View.OnClickListener {
 
     private void showSerialState() {
         if(MyApp.uart_device_name != null){
-            mTv_serialstate.setText(MyApp.uart_device_name);
+            mTv_serialstate.setText(MyApp.uart_device_name.toString());
         }
     }
 

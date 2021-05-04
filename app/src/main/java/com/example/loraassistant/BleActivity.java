@@ -42,6 +42,7 @@ import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 import com.example.loraassistant.Adapter.DeviceAdapter;
+import com.example.loraassistant.Common.MyApp;
 import com.example.loraassistant.Common.ObserverManager;
 
 import java.util.ArrayList;
@@ -86,15 +87,6 @@ public class BleActivity extends AppCompatActivity implements View.OnClickListen
 
     private void initView() {
         mToolbar = findViewById(R.id.toolbar_ble);
-////        //设置toolbar旁边的返回键
-//        setSupportActionBar(mToolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            getSupportActionBar().setHomeButtonEnabled(true);
-//        }
-
 
         mBtn_scan = findViewById(R.id.btn_scan);
         mBtn_scan.setOnClickListener(this);
@@ -168,6 +160,7 @@ public class BleActivity extends AppCompatActivity implements View.OnClickListen
                                 mBluetoothGattCharacteristic = characteristic;
                                 mBleDevice = bleDevice;
                                 isBleReady = true;
+                                MyApp.isBleEnable = true;
                             }
                         }
                     }

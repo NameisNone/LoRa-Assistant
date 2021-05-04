@@ -48,13 +48,13 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     private UsbPermission usbPermission = UsbPermission.Unknown;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         fragmentManager = getFragmentManager();
+
         //初始化UI控件
         initUI();
         InitUsbUart();
@@ -129,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
+                MyApp.ReadBuff = new String();
+                MyApp.ReadBuff = (String) msg.obj;
+                MyApp.isUartReadBuffNull = false;
             }
         };
         //尝试请求usb权限，请求成功说明有设备连接

@@ -29,6 +29,7 @@ import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.example.loraassistant.Adapter.Alarm;
 import com.example.loraassistant.Adapter.AlarmAdapter;
+import com.example.loraassistant.Common.MyApp;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -186,11 +187,12 @@ public class CtrlActivity extends Activity {
         }
     }
 
+    //拖动条的监听事件类
     private class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//            Toast.makeText(getActivity(),String.format("%d",progress),Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(),String.format("SeekBar进度值:%d",progress),Toast.LENGTH_SHORT).show();
             light_value = (byte) progress;
             TextView tv_light = findViewById(R.id.tv_light_value);
             tv_light.setText(String.format("%d", progress));
@@ -198,12 +200,14 @@ public class CtrlActivity extends Activity {
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-//            Toast.makeText(getActivity(),"按下SeekBar",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(),"按下SeekBar",Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-//            Toast.makeText(getActivity(),"释放SeekBar",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(),"释放SeekBar",Toast.LENGTH_SHORT).show();
+            //发送亮度数据
+            MyApp.CtrlLed(mNodeNum, light_value);
         }
     }
 
@@ -224,19 +228,18 @@ public class CtrlActivity extends Activity {
                     else
                         mSb_Light.setProgress(0);
                     break;
-                case R.id.img_switch:
-                    if(mImg_Switch.getTag().equals("off")){//开灯
+                case R.id.img_switch://灯的开关按钮
+                    if(mImg_Switch.getTag().equals("off")){
                         mImg_Switch.setImageResource(R.mipmap.button_on);
                         mImg_Switch.setTag("on");
-                        BleLedCtrl(true);
-                    }else if(mImg_Switch.getTag().equals("on")){//关灯
+                        MyApp.CtrlLed(mNodeNum, MyApp.LedState.LedOn);//开灯
+                    }else if(mImg_Switch.getTag().equals("on")){
                         mImg_Switch.setImageResource(R.mipmap.button_off);
                         mImg_Switch.setTag("off");
-                        BleLedCtrl(false);
+                        MyApp.CtrlLed(mNodeNum, MyApp.LedState.LedOff);//关灯
                     }
                     break;
                 case R.id.tv_addTimedEvent:
-//                    pvCustomTime.show();
                     showCustomTimePicker();
                     break;
             }

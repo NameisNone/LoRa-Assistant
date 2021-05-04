@@ -122,8 +122,10 @@
         android:id="@+id/tv_recv"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
         android:background="@android:drawable/edit_text"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
     <TextView
         android:layout_width="wrap_content"

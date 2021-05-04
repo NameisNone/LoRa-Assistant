@@ -1,10 +1,8 @@
 package com.example.loraassistant;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -50,6 +48,25 @@ public class SerialActivity extends AppCompatActivity {
         setContentView(R.layout.activity_serial);
 
         initUI();
+        //启动一个线程读取接收到的数据
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                while (true){
+                    if(!MyApp.isUartReadBuffNull){
+                        String RxBuf = MyApp.ReadBuff.toString();
+                        if(mTv_read.getText().length() > 0){
+                                mTv_read.append("\r\n" + RxBuf);
+                            }else{
+                                mTv_read.setText(RxBuf);
+                        }
+                        MyApp.isUartReadBuffNull = true;
+                        MyApp.ReadBuff = new String("");
+                    }
+                }
+            }
+        }.start();
     }
 
     private void initUI() {
@@ -73,6 +90,7 @@ public class SerialActivity extends AppCompatActivity {
 
         mEt_write = findViewById(R.id.et_send);
         mTv_read  = findViewById(R.id.tv_recv);
+        mTv_read.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         onClick = new OnClick();
         mBtn_send = findViewById(R.id.send_btn);
@@ -87,95 +105,27 @@ public class SerialActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.send_btn:
-                    InitCH34xUART();
-//                    CH34xWriteData();
+                    CH34xWriteData();
                     break;
                 case R.id.clear_btn:
                     mTv_read.setText("");
-                    mEt_write.setText("");
                     break;
             }
         }
     }
 
-    public void InitCH34xUART(){
-        //请求USB权限
-//        int ret = MyApp.ch34x_driver.ResumeUsbPermission();
-        if(MyApp.ch34x_driver.ResumeUsbPermission() == 0){
-            mBtn_send.setEnabled(false);
-            int ret = MyApp.ch34x_driver.ResumeUsbList();
-            if(ret == -1){
-                Toast.makeText(getApplicationContext(),"获取设备列表失败!",Toast.LENGTH_SHORT).show();
-                MyApp.ch34x_driver.CloseDevice();
-            }else if (ret == 0){
-                if(MyApp.ch34x_driver.mDeviceConnection != null){
-                    if(!MyApp.ch34x_driver.UartInit()){
-                        Toast.makeText(getApplicationContext(),"初始化串口失败!",Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Toast.makeText(getApplicationContext(),"串口初始化成功!",Toast.LENGTH_SHORT).show();
-                    if(!MyApp.ch34x_driver.SetConfig(115200, (byte) 8, (byte)0,(byte)0,(byte)0)){
-                        Toast.makeText(getApplicationContext(),"串口配置失败!",Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Toast.makeText(getApplicationContext(),"串口配置成功!",Toast.LENGTH_SHORT).show();
-                    CH34xReadData();
-                }
-            }else{
-                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                builder.setIcon(R.drawable.bg_img_key);
-                builder.setTitle("未授权限");
-                builder.setMessage("确认退出吗?");
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        System.exit(0);
-                    }
-                });
-                builder.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // TODO Auto-generated method stub
-
-                    }
-                });
-                builder.show();
-            }
-        }
-    }
     //发送数据
     private void CH34xWriteData(){
-        byte[] to_send = toByteArray2(mEt_write.getText().toString());		//以字符串方式发送
+        if(MyApp.isUartEnable){
+            byte[] to_send = toByteArray2(mEt_write.getText().toString());		//以字符串方式发送
 //        Toast.makeText(getApplicationContext(), String.format("0x%02x",to_send[0]), Toast.LENGTH_SHORT).show();
-        int retval = MyApp.ch34x_driver.WriteData(to_send, to_send.length);//写数据，第一个参数为需要发送的字节数组，第二个参数为需要发送的字节长度，返回实际发送的字节长度
-        if (retval < 0) {
-            Toast.makeText(getApplicationContext(), "发送失败!", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(getApplicationContext(), "发送成功!", Toast.LENGTH_SHORT).show();
-        }
-    }
-    //读数据
-    private void CH34xReadData() {
-        //创建一个新的线程来读取数据，将读取的数据通过handler发送出去进行处理
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                byte[] buffer = new byte[4096];
-                while (true){ //一直循环读取数据
-                    Message message = new Message();
-                    int len =MyApp.ch34x_driver.ReadData(buffer, 4096);
-                    if(len>0){
-//                        String recv = toHexString(buffer, len);	//以16进制形式输出
-                        String recv = new String(buffer, 0, len);//以字符串形式输出
-                        message.obj = recv;
-                        MyApp.ch34x_read_handler.sendMessage(message);
-                    }
-                }
+            int retval = MyApp.ch34x_driver.WriteData(to_send, to_send.length);//写数据，第一个参数为需要发送的字节数组，第二个参数为需要发送的字节长度，返回实际发送的字节长度
+            if (retval < 0) {
+                Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
             }
-        }.start();
+        }
     }
 
     //OnItemSelected监听器
